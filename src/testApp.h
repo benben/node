@@ -25,26 +25,20 @@ class testApp : public ofBaseApp{
 		void mouseReleased(int x, int y, int button);
 		void windowResized(int w, int h);
 
-        #ifdef _USE_LIVE_VIDEO
-		  ofVideoGrabber 		vidGrabber;
-		#else
-		  ofVideoPlayer 		vidPlayer;
-		#endif
+        ofVideoPlayer 		cam_1, cam_2;
 
-        ofxCvColorImage		colorImg;
+        ofxCvColorImage		colorImg_1, colorImg_2;
 
-        ofxCvGrayscaleImage 	grayImage;
-		ofxCvGrayscaleImage 	grayBg;
-		ofxCvGrayscaleImage 	grayDiff;
-
-        ofxCvContourFinder 	contourFinder;
+        ofxCvGrayscaleImage 	grayImg_1, grayImg_2;
+		ofxCvGrayscaleImage 	grayBg_1, grayBg_2;
+		ofxCvGrayscaleImage 	grayDiff_1, grayDiff_2;
 
 		int 				threshold;
 		bool				bLearnBakground;
 
-		SimpleThread thread;
+		SimpleThread thread_1, thread_2;
 
-		vector<ofxCvBlob> blobs;
+		vector<ofxCvBlob> blobs, blobs_1, blobs_2;
 
 
 };
