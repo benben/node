@@ -5,10 +5,24 @@
 
 #include "ofxOpenCv.h"
 #include "SimpleThread.h"
+#include "ofxVectorMath.h"
 
 //#define _USE_LIVE_VIDEO		// uncomment this to use a live camera
 								// otherwise, we'll use a movie file
 
+
+struct trackedBlob
+{
+    int frame;
+    int framesAlive;
+    float height;
+    int ID;
+    float pX;
+    float pY;
+    float width;
+    float x;
+    float y;
+};
 
 class testApp : public ofBaseApp{
 
@@ -17,6 +31,7 @@ class testApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+		void trackBlobs(vector<ofxCvBlob> _blobs);
 
 		void keyPressed  (int key);
 		void mouseMoved(int x, int y );
@@ -38,9 +53,9 @@ class testApp : public ofBaseApp{
 
 		SimpleThread thread_1, thread_2;
 
-		vector<ofxCvBlob> blobs, blobs_1, blobs_2;
-
-
+		vector<ofxCvBlob> blobs_1, blobs_2;
+		vector<trackedBlob> blobs;
+		int                 ID;
 };
 
 #endif

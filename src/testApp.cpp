@@ -4,10 +4,10 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    cam_1.loadMovie("fingers.mov");
+    cam_1.loadMovie("fingers.mpg");
     cam_1.play();
 
-    cam_2.loadMovie("fingers.mov");
+    cam_2.loadMovie("fingers.mpg");
     cam_2.play();
 
     colorImg_1.allocate(320,240);
@@ -23,8 +23,53 @@ void testApp::setup(){
 	bLearnBakground = true;
 	threshold = 80;
 
-	thread_1.initAndSleep();
+	thread_1.start();
 	thread_2.start();
+
+	ID = 0;
+}
+
+void testApp::trackBlobs(vector<ofxCvBlob> _blobs) {
+
+    ofxVec2f _b;
+    ofxVec2f b;
+    for (int i = 0; i < _blobs.size(); i++){
+        bool bIsNewBlob = true;
+        for (int j = 0; j < blobs.size(); j++){
+            _b.set( _blobs[i].centroid );
+            b.set(blobs[j].x, blobs[j].y);
+            //cout << b.distance(_b) << endl;
+            if(b.distance(_b) < 30) {
+                bIsNewBlob = false;
+                blobs[i].frame = ofGetFrameNum();
+                blobs[i].pX = blobs[i].x;
+                blobs[i].pY = blobs[i].y;
+                blobs[i].x = _b.x;
+                blobs[i].y = _b.y;
+            }
+        }
+
+        if(bIsNewBlob) {
+            trackedBlob tB;
+            tB.ID = ID; ID++;
+            tB.frame = ofGetFrameNum();
+            tB.x = _blobs[i].centroid.x;
+            tB.y = _blobs[i].centroid.y;
+            tB.pX = _blobs[i].centroid.x;
+            tB.pY = _blobs[i].centroid.y;
+            tB.framesAlive = 0;
+            blobs.push_back(tB);
+        }
+    }
+
+    //kill all blobs which weren't updated since the last 5 frames
+    for (int j = 0; j < blobs.size(); j++){
+        if(blobs[j].frame < ofGetFrameNum() - 5 ) {
+            blobs.erase(blobs.begin() + j);
+        } else {
+            blobs[j].framesAlive += 1;
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -58,10 +103,10 @@ void testApp::update(){
 		// also, find holes is set to true so we will get interior contours as well....
 		//contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);	// find holes
         thread_1.setImage(grayDiff_1);
-
         blobs_1 = thread_1.getBlobs();
-
 	}
+
+    trackBlobs(blobs_1);
 
 	if (bNewFrame_2){
 
@@ -85,7 +130,6 @@ void testApp::update(){
         blobs_2 = thread_2.getBlobs();
 
 	}
-
 }
 
 //--------------------------------------------------------------
@@ -118,19 +162,30 @@ void testApp::draw(){
 
 	// or, instead we can draw each blob individually,
 	// this is how to get access to them:
-    for (int i = 0; i < blobs_1.size(); i++){
-        blobs_1[i].draw(360,540);
-    }
+    //for (int i = 0; i < blobs_1.size(); i++){
+    //    blobs_1[i].draw(360,540);
+    //    ofCircle(blobs_1[i].centroid.x + 360,blobs_1[i].centroid.y +540,5);
+    //}
 
     for (int i = 0; i < blobs_2.size(); i++){
         blobs_2[i].draw(1040,540);
     }
-
+ofTranslate(360,540);
+    for (int i = 0; i < blobs.size(); i++){
+    // pos += (targetPos - pos) * SPEED;
+            ofSetHexColor(0xffffff);
+            cout << blobs[i].ID << endl;
+            if(blobs[i].framesAlive > 10) {
+            ofLine(blobs[i].x,blobs[i].y,blobs[i].pX,blobs[i].pY);
+            ofCircle(blobs[i].x,blobs[i].y,5);
+            }
+    }
+ofTranslate(-360,-540);
 	// finally, a report:
 
 	ofSetHexColor(0xffffff);
 	char reportStr[1024];
-	sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\nfps: %f", threshold, ofGetFrameRate());
+	sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\ntracked Blob count: %i\nfps: %f", threshold, blobs.size(), ofGetFrameRate());
 	ofDrawBitmapString(reportStr, 20, 600);
 }
 
@@ -149,12 +204,6 @@ void testApp::keyPressed  (int key){
 		case '-':
 			threshold --;
 			if (threshold < 0) threshold = 0;
-			break;
-        case 't':
-                thread_1.beginUpdate();
-			break;
-        case 'z':
-                thread_1.pauseUpdate();
 			break;
 	}
 }
