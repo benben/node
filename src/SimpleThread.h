@@ -6,7 +6,7 @@
 class SimpleThread:public ofxRuiThread
 {
 public:
-    ofVideoPlayer 		cam;
+    ofVideoGrabber cam;
 
     ofxCvColorImage		colorImg;
 
@@ -17,13 +17,11 @@ public:
     int 				threshold;
     bool				bLearnBackground;
     ofxCvContourFinder 	contourFinder;
-    bool bhasNewImage;
 
     SimpleThread()
     {
-        cam.loadMovie("fingers.mov");
-        cam.play();
-
+        //cam.initGrabber(640,480);
+        //cam.setUseTexture(false);
         //colorImg.setUseTexture(false);
         colorImg.allocate(320,240);
         //grayImg.setUseTexture(false);
@@ -38,30 +36,27 @@ public:
 
     void updateThread()
     {
-        cam.idleMovie();
-        if(cam.isFrameNew())
-        {
-            colorImg.setFromPixels(cam.getPixels(), 320,240);
+            cam.grabFrame();
 
-            grayImg = colorImg;
-            if (bLearnBackground == true)
+            if(cam.isFrameNew())
             {
-                grayBg = grayImg;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
-                bLearnBackground = false;
+                colorImg.setFromPixels(cam.getPixels(), 320,240);
+                grayImg = colorImg;
+                if (bLearnBackground == true)
+                {
+                    grayBg = grayImg;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
+                    bLearnBackground = false;
+                }
+
+                // take the abs value of the difference between background and incoming and then threshold:
+                grayDiff.absDiff(grayBg, grayImg);
+                grayDiff.threshold(threshold);
+
+                // find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
+                // also, find holes is set to true so we will get interior contours as well....
+                //contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);	// find holes
+                contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);
             }
-
-            // take the abs value of the difference between background and incoming and then threshold:
-            grayDiff.absDiff(grayBg, grayImg);
-            grayDiff.threshold(threshold);
-
-            // find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
-            // also, find holes is set to true so we will get interior contours as well....
-            //contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);	// find holes
-
-            contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);
-        }
-
-        // draw the incoming, the grayscale, the bg and the thresholded difference
     }
 
     void draw()

@@ -39,6 +39,7 @@ public:
     void setup();
     void update();
     void draw();
+    void exit();
     void trackBlobs(vector<ofxCvBlob> _blobs);
 
     void keyPressed  (int key);
@@ -64,6 +65,7 @@ public:
     vector<ofxCvBlob> blobs_1, blobs_2;
     vector<trackedBlob> blobs;
     int                 ID;
+    ofVideoGrabber  cam;
 };
 
 #endif

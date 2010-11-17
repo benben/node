@@ -4,11 +4,17 @@
 //--------------------------------------------------------------
 void testApp::setup()
 {
-
-    bLearnBakground = true;
+    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetFrameRate(30);
     threshold = 80;
 
+    thread_1.cam.setVerbose(true);
+    thread_1.cam.setDesiredFrameRate(125);
+    thread_1.cam.initGrabber(320,240);
+    thread_1.cam.setUseTexture(false);
+
     thread_1.initAndSleep();
+    //thread_1.start();
     //thread_2.start();
 
     ID = 0;
@@ -26,22 +32,22 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
         {
             _b.set( _blobs[i].centroid );
             b.set(blobs[j].x, blobs[j].y);
-            //cout << b.distance(_b) << endl;
             if(b.distance(_b) < 30)
             {
                 bIsNewBlob = false;
                 blobs[i].frame = ofGetFrameNum();
-                blobs[i].pX = blobs[i].x;
-                blobs[i].pY = blobs[i].y;
                 blobs[i].x = _b.x;
                 blobs[i].y = _b.y;
+                /*blobs[i].pX = blobs[i].x;
+                blobs[i].pY = blobs[i].y;
                 blobs[i].nPts = _blobs[i].nPts;
                 blobs[i].pts = _blobs[i].pts;
                 blobs[i].boundingRect.x           = _blobs[i].boundingRect.x;
                 blobs[i].boundingRect.y           = _blobs[i].boundingRect.y;
                 blobs[i].boundingRect.width       = _blobs[i].boundingRect.width;
-                blobs[i].boundingRect.height      = _blobs[i].boundingRect.height;
+                blobs[i].boundingRect.height      = _blobs[i].boundingRect.height;*/
             }
+
         }
 
         if(bIsNewBlob)
@@ -53,14 +59,14 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
             tB.frame = ofGetFrameNum();
             tB.x = _blobs[i].centroid.x;
             tB.y = _blobs[i].centroid.y;
-            tB.pX = _blobs[i].centroid.x;
+            /*tB.pX = _blobs[i].centroid.x;
             tB.pY = _blobs[i].centroid.y;
             tB.nPts = _blobs[i].nPts;
             tB.pts = _blobs[i].pts;
             tB.boundingRect.x           = _blobs[i].boundingRect.x;
             tB.boundingRect.y           = _blobs[i].boundingRect.y;
             tB.boundingRect.width       = _blobs[i].boundingRect.width;
-            tB.boundingRect.height      = _blobs[i].boundingRect.height;
+            tB.boundingRect.height      = _blobs[i].boundingRect.height;*/
             tB.framesAlive = 0;
             tB.alpha = 0;
             blobs.push_back(tB);
@@ -123,7 +129,6 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
 void testApp::update()
 {
     ofBackground(100,100,100);
-
     thread_1.updateOnce();
     blobs_1 = thread_1.getBlobs();
     trackBlobs(blobs_1);
@@ -194,9 +199,9 @@ void testApp::draw()
 void testApp::keyPressed  (int key)
 {
 
-    /*	switch (key){
+    	switch (key){
     		case ' ':
-    			bLearnBakground = true;
+    			thread_1.bLearnBackground = true;
     			break;
     		case '+':
     			threshold ++;
@@ -206,7 +211,7 @@ void testApp::keyPressed  (int key)
     			threshold --;
     			if (threshold < 0) threshold = 0;
     			break;
-    	}*/
+    	}
 }
 
 //--------------------------------------------------------------
@@ -234,5 +239,10 @@ void testApp::mouseReleased(int x, int y, int button)
 void testApp::windowResized(int w, int h)
 {
 
+}
+
+void testApp::exit() {
+    blobs_1 = vector<ofPoint>();
+    thread_1.stop();
 }
 
