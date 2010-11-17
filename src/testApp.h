@@ -11,6 +11,8 @@
 								// otherwise, we'll use a movie file
 
 
+enum trackedBlobState { UPCOMING, ALIVE, DYING };
+
 struct trackedBlob
 {
     int frame;
@@ -22,6 +24,11 @@ struct trackedBlob
     float width;
     float x;
     float y;
+    int nPts;
+    vector <ofPoint>    pts;
+    ofRectangle         boundingRect;
+    trackedBlobState    state;
+    int alpha;
 };
 
 class testApp : public ofBaseApp{

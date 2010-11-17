@@ -4,27 +4,11 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    cam_1.loadMovie("fingers.mpg");
-    cam_1.play();
-
-    cam_2.loadMovie("fingers.mpg");
-    cam_2.play();
-
-    colorImg_1.allocate(320,240);
-	grayImg_1.allocate(320,240);
-	grayBg_1.allocate(320,240);
-	grayDiff_1.allocate(320,240);
-
-    colorImg_2.allocate(320,240);
-	grayImg_2.allocate(320,240);
-	grayBg_2.allocate(320,240);
-	grayDiff_2.allocate(320,240);
-
 	bLearnBakground = true;
 	threshold = 80;
 
-	thread_1.start();
-	thread_2.start();
+	thread_1.initAndSleep();
+	//thread_2.start();
 
 	ID = 0;
 }
@@ -36,39 +20,83 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs) {
     for (int i = 0; i < _blobs.size(); i++){
         bool bIsNewBlob = true;
         for (int j = 0; j < blobs.size(); j++){
-            _b.set( _blobs[i].centroid );
-            b.set(blobs[j].x, blobs[j].y);
-            //cout << b.distance(_b) << endl;
-            if(b.distance(_b) < 30) {
-                bIsNewBlob = false;
-                blobs[i].frame = ofGetFrameNum();
-                blobs[i].pX = blobs[i].x;
-                blobs[i].pY = blobs[i].y;
-                blobs[i].x = _b.x;
-                blobs[i].y = _b.y;
-            }
+            //only check with blobs, which aren't marked for kill
+                _b.set( _blobs[i].centroid );
+                b.set(blobs[j].x, blobs[j].y);
+                //cout << b.distance(_b) << endl;
+                if(b.distance(_b) < 30) {
+                    bIsNewBlob = false;
+                    blobs[i].frame = ofGetFrameNum();
+                    blobs[i].pX = blobs[i].x;
+                    blobs[i].pY = blobs[i].y;
+                    blobs[i].x = _b.x;
+                    blobs[i].y = _b.y;
+                    blobs[i].nPts = _blobs[i].nPts;
+                    blobs[i].pts = _blobs[i].pts;
+                    blobs[i].boundingRect.x           = _blobs[i].boundingRect.x;
+                    blobs[i].boundingRect.y           = _blobs[i].boundingRect.y;
+                    blobs[i].boundingRect.width       = _blobs[i].boundingRect.width;
+                    blobs[i].boundingRect.height      = _blobs[i].boundingRect.height;
+                }
         }
 
         if(bIsNewBlob) {
             trackedBlob tB;
             tB.ID = ID; ID++;
+            tB.state = UPCOMING;
             tB.frame = ofGetFrameNum();
             tB.x = _blobs[i].centroid.x;
             tB.y = _blobs[i].centroid.y;
             tB.pX = _blobs[i].centroid.x;
             tB.pY = _blobs[i].centroid.y;
+            tB.nPts = _blobs[i].nPts;
+            tB.pts = _blobs[i].pts;
+            tB.boundingRect.x           = _blobs[i].boundingRect.x;
+            tB.boundingRect.y           = _blobs[i].boundingRect.y;
+            tB.boundingRect.width       = _blobs[i].boundingRect.width;
+            tB.boundingRect.height      = _blobs[i].boundingRect.height;
             tB.framesAlive = 0;
+            tB.alpha = 0;
             blobs.push_back(tB);
         }
     }
 
-    //kill all blobs which weren't updated since the last 5 frames
+    //finally kill all blobs which weren't updated the last 50 frames
     for (int j = 0; j < blobs.size(); j++){
-        if(blobs[j].frame < ofGetFrameNum() - 5 ) {
+        if(blobs[j].frame < ofGetFrameNum() - 50) {
             blobs.erase(blobs.begin() + j);
-        } else {
-            blobs[j].framesAlive += 1;
         }
+    }
+
+    for (int j = 0; j < blobs.size(); j++){
+
+        //if blob comes up, fade it in
+        if(blobs[j].state == UPCOMING) {
+            blobs[j].alpha = (blobs[j].framesAlive - 10) * 5;
+        }
+
+        //set state to alive, if they live longer then 10 frames
+        //set alpha to 255
+        if(blobs[j].framesAlive > 30) {
+            blobs[j].state = ALIVE;
+            blobs[j].alpha = 255;
+        }
+
+        //set state dying which weren't updated since the last 5 frames
+        //fade alpha out
+        if(blobs[j].frame < ofGetFrameNum() - 2) {
+            blobs[j].state = DYING;
+            blobs[j].alpha = -6 * (ofGetFrameNum() - blobs[j].frame) + blobs[j].alpha;
+        }
+
+        //count frames alive
+        if(blobs[j].state != DYING) {
+            blobs[j].framesAlive++;
+        }
+
+        //bound alpha to 0..255
+        if (blobs[j].alpha > 255) { blobs[j].alpha = 255; }
+        if (blobs[j].alpha < 0) { blobs[j].alpha = 0; }
     }
 }
 
@@ -76,78 +104,15 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs) {
 void testApp::update(){
 	ofBackground(100,100,100);
 
-    bool bNewFrame_1 = false;
-    bool bNewFrame_2 = false;
-
-    cam_1.idleMovie();
-    bNewFrame_1 = cam_1.isFrameNew();
-
-    cam_2.idleMovie();
-    bNewFrame_2 = cam_2.isFrameNew();
-
-	if (bNewFrame_1){
-
-        colorImg_1.setFromPixels(cam_1.getPixels(), 320,240);
-
-        grayImg_1 = colorImg_1;
-		if (bLearnBakground == true){
-			grayBg_1 = grayImg_1;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
-			//##bLearnBakground = false;
-		}
-
-		// take the abs value of the difference between background and incoming and then threshold:
-		grayDiff_1.absDiff(grayBg_1, grayImg_1);
-		grayDiff_1.threshold(threshold);
-
-		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
-		// also, find holes is set to true so we will get interior contours as well....
-		//contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);	// find holes
-        thread_1.setImage(grayDiff_1);
-        blobs_1 = thread_1.getBlobs();
-	}
-
+    thread_1.updateOnce();
+    blobs_1 = thread_1.getBlobs();
     trackBlobs(blobs_1);
-
-	if (bNewFrame_2){
-
-        colorImg_2.setFromPixels(cam_2.getPixels(), 320,240);
-
-        grayImg_2 = colorImg_2;
-		if (bLearnBakground == true){
-			grayBg_2 = grayImg_2;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
-			bLearnBakground = false;
-		}
-
-		// take the abs value of the difference between background and incoming and then threshold:
-		grayDiff_2.absDiff(grayBg_2, grayImg_2);
-		grayDiff_2.threshold(threshold);
-
-		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
-		// also, find holes is set to true so we will get interior contours as well....
-		//contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);	// find holes
-        thread_2.setImage(grayDiff_2);
-
-        blobs_2 = thread_2.getBlobs();
-
-	}
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
 
-	// draw the incoming, the grayscale, the bg and the thresholded difference
-	ofSetHexColor(0xffffff);
-	colorImg_1.draw(20,20);
-	grayImg_1.draw(360,20);
-	grayBg_1.draw(20,280);
-	grayDiff_1.draw(360,280);
-
-    // draw the incoming, the grayscale, the bg and the thresholded difference
-	ofSetHexColor(0xffffff);
-	colorImg_2.draw(700,20);
-	grayImg_2.draw(1040,20);
-	grayBg_2.draw(700,280);
-	grayDiff_2.draw(1040,280);
+    thread_1.draw();
 
 	// then draw the contours:
 
@@ -157,30 +122,40 @@ void testApp::draw(){
 	ofRect(1040,540,320,240);
 	ofSetHexColor(0xffffff);
 
-	// we could draw the whole contour finder
-	// contourFinder.draw(360,540);
-
-	// or, instead we can draw each blob individually,
-	// this is how to get access to them:
-    //for (int i = 0; i < blobs_1.size(); i++){
-    //    blobs_1[i].draw(360,540);
-    //    ofCircle(blobs_1[i].centroid.x + 360,blobs_1[i].centroid.y +540,5);
-    //}
-
-    for (int i = 0; i < blobs_2.size(); i++){
-        blobs_2[i].draw(1040,540);
-    }
-ofTranslate(360,540);
+    ofTranslate(360,520);
     for (int i = 0; i < blobs.size(); i++){
-    // pos += (targetPos - pos) * SPEED;
-            ofSetHexColor(0xffffff);
-            cout << blobs[i].ID << endl;
-            if(blobs[i].framesAlive > 10) {
-            ofLine(blobs[i].x,blobs[i].y,blobs[i].pX,blobs[i].pY);
-            ofCircle(blobs[i].x,blobs[i].y,5);
+        // pos += (targetPos - pos) * SPEED;
+
+        ofSetHexColor(0xdd00cc);
+
+        ofNoFill();
+        for( int i=0; i<(int)blobs.size(); i++ ) {
+            ofRect( blobs[i].boundingRect.x, blobs[i].boundingRect.y,
+                    blobs[i].boundingRect.width, blobs[i].boundingRect.height );
+        }
+
+        ofSetHexColor(0x00ffff);
+
+        for( int i=0; i<(int)blobs.size(); i++ ) {
+            ofNoFill();
+            ofBeginShape();
+            for( int j=0; j<blobs[i].nPts; j++ ) {
+                ofVertex( blobs[i].pts[j].x, blobs[i].pts[j].y );
             }
+            ofEndShape();
+
+        }
+
+        ofFill();
+        ofEnableAlphaBlending();
+        ofSetColor(255,255,255,blobs[i].alpha);
+        ofLine(blobs[i].x,blobs[i].y,blobs[i].pX,blobs[i].pY);
+        ofCircle(blobs[i].x,blobs[i].y,5);
+
+        ofDisableAlphaBlending();
     }
-ofTranslate(-360,-540);
+    ofTranslate(-360,-520);
+
 	// finally, a report:
 
 	ofSetHexColor(0xffffff);
@@ -193,7 +168,7 @@ ofTranslate(-360,-540);
 //--------------------------------------------------------------
 void testApp::keyPressed  (int key){
 
-	switch (key){
+/*	switch (key){
 		case ' ':
 			bLearnBakground = true;
 			break;
@@ -205,7 +180,7 @@ void testApp::keyPressed  (int key){
 			threshold --;
 			if (threshold < 0) threshold = 0;
 			break;
-	}
+	}*/
 }
 
 //--------------------------------------------------------------
