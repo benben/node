@@ -9,13 +9,11 @@ void testApp::setup()
     threshold = 80;
 
     thread_1.cam.setVerbose(true);
-    thread_1.cam.setDesiredFrameRate(125);
+    thread_1.cam.setDesiredFrameRate(60);
     thread_1.cam.initGrabber(320,240);
     thread_1.cam.setUseTexture(false);
 
     thread_1.initAndSleep();
-    //thread_1.start();
-    //thread_2.start();
 
     ID = 0;
 }
@@ -32,20 +30,20 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
         {
             _b.set( _blobs[i].centroid );
             b.set(blobs[j].x, blobs[j].y);
-            if(b.distance(_b) < 30)
+            if(b.distance(_b) < 10)
             {
                 bIsNewBlob = false;
-                blobs[i].frame = ofGetFrameNum();
-                blobs[i].x = _b.x;
-                blobs[i].y = _b.y;
-                /*blobs[i].pX = blobs[i].x;
-                blobs[i].pY = blobs[i].y;
-                blobs[i].nPts = _blobs[i].nPts;
-                blobs[i].pts = _blobs[i].pts;
-                blobs[i].boundingRect.x           = _blobs[i].boundingRect.x;
-                blobs[i].boundingRect.y           = _blobs[i].boundingRect.y;
-                blobs[i].boundingRect.width       = _blobs[i].boundingRect.width;
-                blobs[i].boundingRect.height      = _blobs[i].boundingRect.height;*/
+                blobs[j].frame = ofGetFrameNum();
+                blobs[j].pX = blobs[j].x;
+                blobs[j].pY = blobs[j].y;
+                blobs[j].x = _blobs[i].centroid.x;
+                blobs[j].y = _blobs[i].centroid.y;
+                blobs[j].nPts = _blobs[i].nPts;
+                blobs[j].pts = _blobs[i].pts;
+                blobs[j].boundingRect.x           = _blobs[i].boundingRect.x;
+                blobs[j].boundingRect.y           = _blobs[i].boundingRect.y;
+                blobs[j].boundingRect.width       = _blobs[i].boundingRect.width;
+                blobs[j].boundingRect.height      = _blobs[i].boundingRect.height;
             }
 
         }
@@ -59,14 +57,14 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
             tB.frame = ofGetFrameNum();
             tB.x = _blobs[i].centroid.x;
             tB.y = _blobs[i].centroid.y;
-            /*tB.pX = _blobs[i].centroid.x;
+            tB.pX = _blobs[i].centroid.x;
             tB.pY = _blobs[i].centroid.y;
             tB.nPts = _blobs[i].nPts;
             tB.pts = _blobs[i].pts;
             tB.boundingRect.x           = _blobs[i].boundingRect.x;
             tB.boundingRect.y           = _blobs[i].boundingRect.y;
             tB.boundingRect.width       = _blobs[i].boundingRect.width;
-            tB.boundingRect.height      = _blobs[i].boundingRect.height;*/
+            tB.boundingRect.height      = _blobs[i].boundingRect.height;
             tB.framesAlive = 0;
             tB.alpha = 0;
             blobs.push_back(tB);
@@ -156,16 +154,11 @@ void testApp::draw()
         ofSetHexColor(0xdd00cc);
 
         ofNoFill();
-        for( int i=0; i<(int)blobs.size(); i++ )
-        {
             ofRect( blobs[i].boundingRect.x, blobs[i].boundingRect.y,
                     blobs[i].boundingRect.width, blobs[i].boundingRect.height );
-        }
 
         ofSetHexColor(0x00ffff);
 
-        for( int i=0; i<(int)blobs.size(); i++ )
-        {
             ofNoFill();
             ofBeginShape();
             for( int j=0; j<blobs[i].nPts; j++ )
@@ -174,21 +167,39 @@ void testApp::draw()
             }
             ofEndShape();
 
-        }
 
         ofFill();
         ofEnableAlphaBlending();
         ofSetColor(255,255,255,blobs[i].alpha);
         ofLine(blobs[i].x,blobs[i].y,blobs[i].pX,blobs[i].pY);
-        ofCircle(blobs[i].x,blobs[i].y,5);
+        float size = sqrt( pow(blobs[i].boundingRect.width,2) + pow(blobs[i].boundingRect.height,2) ) / 2 * 0.8;
+        ofCircle(blobs[i].x,blobs[i].y,size);
 
         ofDisableAlphaBlending();
     }
     ofTranslate(-360,-520);
 
+
     // finally, a report:
 
     ofSetHexColor(0xffffff);
+
+    ofDrawBitmapString("ID",800,20);
+    ofDrawBitmapString("x",900,20);
+    ofDrawBitmapString("y",1000,20);
+    ofDrawBitmapString("pX",1100,20);
+    ofDrawBitmapString("pY",1200,20);
+    ofDrawBitmapString("Alive",1300,20);
+    for (int j = 0; j < blobs.size(); j++)
+    {
+        ofDrawBitmapString(ofToString(blobs[j].ID),800,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].x),900,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].y),1000,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].pX),1100,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].pY),1200,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].framesAlive),1300,(j*20) +40 );
+    }
+
     char reportStr[1024];
     sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\ntracked Blob count: %i\nfps: %f", threshold, blobs.size(), ofGetFrameRate());
     ofDrawBitmapString(reportStr, 20, 600);
@@ -242,7 +253,6 @@ void testApp::windowResized(int w, int h)
 }
 
 void testApp::exit() {
-    blobs_1 = vector<ofPoint>();
     thread_1.stop();
 }
 
