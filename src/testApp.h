@@ -8,7 +8,7 @@
 #include "ofxVectorMath.h"
 
 //#define _USE_LIVE_VIDEO		// uncomment this to use a live camera
-								// otherwise, we'll use a movie file
+// otherwise, we'll use a movie file
 
 
 enum trackedBlobState { UPCOMING, ALIVE, DYING };
@@ -31,38 +31,39 @@ struct trackedBlob
     int alpha;
 };
 
-class testApp : public ofBaseApp{
+class testApp : public ofBaseApp
+{
 
-	public:
+public:
 
-		void setup();
-		void update();
-		void draw();
-		void trackBlobs(vector<ofxCvBlob> _blobs);
+    void setup();
+    void update();
+    void draw();
+    void trackBlobs(vector<ofxCvBlob> _blobs);
 
-		void keyPressed  (int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void windowResized(int w, int h);
+    void keyPressed  (int key);
+    void mouseMoved(int x, int y );
+    void mouseDragged(int x, int y, int button);
+    void mousePressed(int x, int y, int button);
+    void mouseReleased(int x, int y, int button);
+    void windowResized(int w, int h);
 
-        ofVideoPlayer 		cam_1, cam_2;
+    ofVideoPlayer 		cam_1, cam_2;
 
-        ofxCvColorImage		colorImg_1, colorImg_2;
+    ofxCvColorImage		colorImg_1, colorImg_2;
 
-        ofxCvGrayscaleImage 	grayImg_1, grayImg_2;
-		ofxCvGrayscaleImage 	grayBg_1, grayBg_2;
-		ofxCvGrayscaleImage 	grayDiff_1, grayDiff_2;
+    ofxCvGrayscaleImage 	grayImg_1, grayImg_2;
+    ofxCvGrayscaleImage 	grayBg_1, grayBg_2;
+    ofxCvGrayscaleImage 	grayDiff_1, grayDiff_2;
 
-		int 				threshold;
-		bool				bLearnBakground;
+    int 				threshold;
+    bool				bLearnBakground;
 
-		SimpleThread thread_1, thread_2;
+    SimpleThread thread_1, thread_2;
 
-		vector<ofxCvBlob> blobs_1, blobs_2;
-		vector<trackedBlob> blobs;
-		int                 ID;
+    vector<ofxCvBlob> blobs_1, blobs_2;
+    vector<trackedBlob> blobs;
+    int                 ID;
 };
 
 #endif

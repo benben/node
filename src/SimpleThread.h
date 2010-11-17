@@ -3,7 +3,8 @@
 #include "ofMain.h"
 #include "ofxRuiThread.h"
 
-class SimpleThread:public ofxRuiThread{
+class SimpleThread:public ofxRuiThread
+{
 public:
     ofVideoPlayer 		cam;
 
@@ -18,8 +19,9 @@ public:
     ofxCvContourFinder 	contourFinder;
     bool bhasNewImage;
 
-	SimpleThread(){
-	    cam.loadMovie("fingers.mov");
+    SimpleThread()
+    {
+        cam.loadMovie("fingers.mov");
         cam.play();
 
         //colorImg.setUseTexture(false);
@@ -32,15 +34,18 @@ public:
         grayDiff.allocate(320,240);
         bLearnBackground = true;
         threshold = 80;
-	}
+    }
 
-	void updateThread(){
-	    cam.idleMovie();
-        if(cam.isFrameNew()) {
+    void updateThread()
+    {
+        cam.idleMovie();
+        if(cam.isFrameNew())
+        {
             colorImg.setFromPixels(cam.getPixels(), 320,240);
 
             grayImg = colorImg;
-            if (bLearnBackground == true){
+            if (bLearnBackground == true)
+            {
                 grayBg = grayImg;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
                 bLearnBackground = false;
             }
@@ -56,18 +61,20 @@ public:
             contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);
         }
 
-        	// draw the incoming, the grayscale, the bg and the thresholded difference
-	}
+        // draw the incoming, the grayscale, the bg and the thresholded difference
+    }
 
-	void draw() {
+    void draw()
+    {
         ofSetHexColor(0xffffff);
         colorImg.draw(20,20);
         grayImg.draw(360,20);
         grayBg.draw(20,280);
         grayDiff.draw(360,280);
-	}
+    }
 
-	vector<ofxCvBlob> getBlobs() {
-	    return contourFinder.blobs;
-	}
+    vector<ofxCvBlob> getBlobs()
+    {
+        return contourFinder.blobs;
+    }
 };
