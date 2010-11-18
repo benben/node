@@ -1,5 +1,5 @@
 #include "testApp.h"
-
+#include "ofxSimpleGuiToo.h"
 
 //--------------------------------------------------------------
 void testApp::setup()
@@ -38,6 +38,34 @@ void testApp::setup()
 
     twoScreenImage.loadImage("adam.jpg");
     toggleDebugOutput = true;
+
+    //GUI
+    warpPoints1[0].x = 0;
+    warpPoints1[0].y = 0;
+    warpPoints1[1].x = 320;
+    warpPoints1[1].y = 0;
+    warpPoints1[2].x = 320;
+    warpPoints1[2].y = 240;
+    warpPoints1[3].x = 0;
+    warpPoints1[3].y = 240;
+
+    warpPoints2[0].x = 0;
+    warpPoints2[0].y = 0;
+    warpPoints2[1].x = 320;
+    warpPoints2[1].y = 0;
+    warpPoints2[2].x = 320;
+    warpPoints2[2].y = 240;
+    warpPoints2[3].x = 0;
+    warpPoints2[3].y = 240;
+
+    //gui.config->gridSize.set(340,0,0);
+    gui.addTitle("1");
+    //gui.config->gridSize.set(340,0,0);
+    gui.addQuadWarper("Cam 1", thread_1.colorImg, warpPoints1);
+    gui.addTitle("2").newColumn = true;
+    gui.addQuadWarper("Cam 2", thread_2.colorImg, warpPoints2);
+    gui.loadFromXML();
+    gui.show();
 }
 
 void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
@@ -335,6 +363,8 @@ void testApp::draw()
     rm.drawScreen(1);
     glPopMatrix();
     }
+
+    gui.draw();
 }
 
 
@@ -380,6 +410,11 @@ void testApp::keyPressed  (int key)
     if(key == 'd')
     {
        debug = !debug;
+    }
+
+    if(key == 'q')
+    {
+        gui.toggleDraw();
     }
 }
 
