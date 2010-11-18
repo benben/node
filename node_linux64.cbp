@@ -83,8 +83,9 @@
 			<Add directory="../../../addons/ofxXmlSettings/libs" />
 			<Add directory="../../../addons/ofxRuiThread/src" />
 			<Add directory="src/FBO" />
-			<Add directory="../../../addons/ofxXmlSettings/libs" />
-			<Add directory="../../../addons/ofxXmlSettings/src" />
+			<Add directory="../../../addons/ofxMSAInteractiveObject/src" />
+			<Add directory="../../../addons/ofxSimpleGuiToo/src" />
+			<Add directory="../../../addons/ofxSimpleGuiToo/src/Controls" />
 		</Compiler>
 		<Linker>
 			<Add library="fmodex" />
@@ -118,18 +119,8 @@
 			<Add after="#" />
 			<Add after="cp -r ../../../export/linux64/libs $(PROJECT_DIR)bin/" />
 		</ExtraCommands>
-		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.cpp" />
-		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.h" />
-		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlerror.cpp" />
-		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlparser.cpp" />
-		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.cpp" />
-		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.h" />
-		<Unit filename="src/FBO/ofTextureAdv.cpp" />
-		<Unit filename="src/FBO/ofTextureAdv.h" />
-		<Unit filename="src/FBO/ofxFBOTexture.cpp" />
-		<Unit filename="src/FBO/ofxFBOTexture.h" />
-		<Unit filename="src/FBO/renderManager.cpp" />
-		<Unit filename="src/FBO/renderManager.h" />
+		<Unit filename="../../../addons/ofxMSAInteractiveObject/src/ofxMSAInteractiveObject.cpp" />
+		<Unit filename="../../../addons/ofxMSAInteractiveObject/src/ofxMSAInteractiveObject.h" />
 		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvBlob.h">
 			<Option virtualFolder="addons/ofxOpenCv/src" />
 		</Unit>
@@ -180,8 +171,54 @@
 		</Unit>
 		<Unit filename="../../../addons/ofxRuiThread/src/ofxRuiThread.cpp" />
 		<Unit filename="../../../addons/ofxRuiThread/src/ofxRuiThread.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiButton.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiButton.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiColorPicker.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiColorPicker.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiComboBox.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiComboBox.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiContent.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiContent.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiFPSCounter.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiFPSCounter.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiMovieSlider.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiMovieSlider.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiQuadWarp.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiQuadWarp.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiSlider2d.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiSlider2d.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiSliderBase.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiSliderFloat.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiSliderInt.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiTitle.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiTitle.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiToggle.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/Controls/ofxSimpleGuiToggle.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiConfig.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiConfig.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiControl.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiControl.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiIncludes.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiPage.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiPage.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiToo.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiToo.h" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiValueControl.cpp" />
+		<Unit filename="../../../addons/ofxSimpleGuiToo/src/ofxSimpleGuiValueControl.h" />
 		<Unit filename="../../../addons/ofxThread/src/ofxThread.cpp" />
 		<Unit filename="../../../addons/ofxThread/src/ofxThread.h" />
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.cpp" />
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.h" />
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlerror.cpp" />
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlparser.cpp" />
+		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.cpp" />
+		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.h" />
+		<Unit filename="src/FBO/ofTextureAdv.cpp" />
+		<Unit filename="src/FBO/ofTextureAdv.h" />
+		<Unit filename="src/FBO/ofxFBOTexture.cpp" />
+		<Unit filename="src/FBO/ofxFBOTexture.h" />
+		<Unit filename="src/FBO/renderManager.cpp" />
+		<Unit filename="src/FBO/renderManager.h" />
 		<Unit filename="src/SimpleThread.h">
 			<Option virtualFolder="src/" />
 		</Unit>
