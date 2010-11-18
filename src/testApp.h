@@ -79,8 +79,6 @@ public:
 
         bool toggleDebugOutput, debug;
         ofImage twoScreenImage;
-        ofPoint             warpPoints1[4];
-        ofPoint             warpPoints2[4];
 };
 
 #endif

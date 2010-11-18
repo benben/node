@@ -40,30 +40,13 @@ void testApp::setup()
     toggleDebugOutput = true;
 
     //GUI
-    warpPoints1[0].x = 0;
-    warpPoints1[0].y = 0;
-    warpPoints1[1].x = 320;
-    warpPoints1[1].y = 0;
-    warpPoints1[2].x = 320;
-    warpPoints1[2].y = 240;
-    warpPoints1[3].x = 0;
-    warpPoints1[3].y = 240;
-
-    warpPoints2[0].x = 0;
-    warpPoints2[0].y = 0;
-    warpPoints2[1].x = 320;
-    warpPoints2[1].y = 0;
-    warpPoints2[2].x = 320;
-    warpPoints2[2].y = 240;
-    warpPoints2[3].x = 0;
-    warpPoints2[3].y = 240;
 
     //gui.config->gridSize.set(340,0,0);
     gui.addTitle("1");
     //gui.config->gridSize.set(340,0,0);
-    gui.addQuadWarper("Cam 1", thread_1.colorImg, warpPoints1);
+    gui.addQuadWarper("Cam 1", thread_1.colorImg, thread_1.warpPoints);
     gui.addTitle("2").newColumn = true;
-    gui.addQuadWarper("Cam 2", thread_2.colorImg, warpPoints2);
+    gui.addQuadWarper("Cam 2", thread_2.colorImg, thread_2.warpPoints);
     gui.loadFromXML();
     gui.show();
 }

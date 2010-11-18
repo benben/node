@@ -18,6 +18,8 @@ public:
     bool				bLearnBackground;
     ofxCvContourFinder 	contourFinder;
 
+    ofPoint             warpPoints[4];
+
     SimpleThread1()
     {
         //cam.initGrabber(640,480);
@@ -32,6 +34,15 @@ public:
         grayDiff.allocate(320,240);
         bLearnBackground = true;
         threshold = 80;
+
+        warpPoints[0].x = 0;
+        warpPoints[0].y = 0;
+        warpPoints[1].x = 320;
+        warpPoints[1].y = 0;
+        warpPoints[2].x = 320;
+        warpPoints[2].y = 240;
+        warpPoints[3].x = 0;
+        warpPoints[3].y = 240;
     }
 
     void updateThread()
@@ -43,6 +54,7 @@ public:
             {
                 colorImg.setFromPixels(cam.getPixels(), 320,240);
                 grayImg = colorImg;
+                grayImg.warpPerspective(warpPoints[0],warpPoints[1],warpPoints[2],warpPoints[3]);
                 if (bLearnBackground == true)
                 {
                     grayBg = grayImg;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
