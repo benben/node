@@ -10,11 +10,18 @@ void testApp::setup()
 
     thread_1.cam.setVerbose(true);
     thread_1.cam.setDesiredFrameRate(60);
+    thread_1.cam.setDeviceID(0);
     thread_1.cam.initGrabber(320,240);
     thread_1.cam.setUseTexture(false);
 
-    thread_2.cam.loadMovie("fingers.mov");
+    /*thread_2.cam.loadMovie("fingers.mov");
     thread_2.cam.play();
+    thread_2.cam.setUseTexture(false);*/
+
+    thread_2.cam.setVerbose(true);
+    thread_2.cam.setDesiredFrameRate(60);
+    thread_2.cam.setDeviceID(1);
+    thread_2.cam.initGrabber(320,240);
     thread_2.cam.setUseTexture(false);
 
     thread_1.initAndSleep();
@@ -142,6 +149,16 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
 void testApp::update()
 {
     ofBackground(100,100,100);
+
+    if(bLearnBackground) {
+        thread_1.bLearnBackground = true;
+        thread_2.bLearnBackground = true;
+        bLearnBackground = false;
+    }
+
+    thread_1.setThreshold(threshold);
+    thread_2.setThreshold(threshold);
+
     thread_1.updateOnce();
     blobs_1 = thread_1.getBlobs();
     trackBlobs(blobs_1);
@@ -156,7 +173,6 @@ void testApp::update()
 //--------------------------------------------------------------
 void testApp::draw()
 {
-
     thread_1.draw();
     thread_2.draw();
 
@@ -216,19 +232,25 @@ void testApp::draw()
         ofSetHexColor(0xFF0000);
         ofRect(0, 0, 100, 600);
 
+        ofSetHexColor(0x0000FF);
+        ofRect(390, 200, 20, 100);
+
         ofSetHexColor(0x00FF00);
         ofRect(700, 0, 100, 600);
 
         ofSetHexColor(0xFFFF00);
         ofRect(390, 0, 20, 100);
 
-        ofSetHexColor(0x0000FF);
-        ofRect(390, 500, 20, 100);
+
+
+        ofSetHexColor(0xFF00FF);
+        ofRect(0,190,800,20);
+        ofSetHexColor(0xFF00FF);
+        ofRect(0,190,800,20);
     }
     ofPopMatrix();
     rm.endOffscreenDraw();
     //ofTranslate(-360,-520);
-
 
     // finally, a report:
 
@@ -302,6 +324,17 @@ void testApp::draw()
     ofDrawBitmapString("screen 2", 710, 290);
 
     ofDrawBitmapString("s - to save to xml   r - to reload from xml    c - reset coordinates    g -  draw open gl shapes\n", 10, 275);
+
+    if(debug) {
+
+    glPushMatrix();
+    glTranslatef(0, 0, 0);
+    glScalef(2,1,0);
+    ofSetHexColor(0xffffff);
+    rm.drawScreen(0);
+    rm.drawScreen(1);
+    glPopMatrix();
+    }
 }
 
 
@@ -312,7 +345,7 @@ void testApp::keyPressed  (int key)
     switch (key)
     {
     case ' ':
-        thread_1.bLearnBackground = true;
+        bLearnBackground = true;
         break;
     case '+':
         threshold ++;
@@ -342,6 +375,11 @@ void testApp::keyPressed  (int key)
     if(key == 'c')
     {
         rm.resetCoordinates();
+    }
+
+    if(key == 'd')
+    {
+       debug = !debug;
     }
 }
 

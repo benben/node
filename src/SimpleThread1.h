@@ -6,7 +6,7 @@
 class SimpleThread1:public ofxRuiThread
 {
 public:
-    ofVideoPlayer cam;
+    ofVideoGrabber cam;
 
     ofxCvColorImage		colorImg;
 
@@ -36,7 +36,8 @@ public:
 
     void updateThread()
     {
-            cam.idleMovie();
+            //cam.idleMovie();
+            cam.grabFrame();
 
             if(cam.isFrameNew())
             {
@@ -78,5 +79,9 @@ public:
     vector<ofxCvBlob> getBlobs()
     {
         return contourFinder.blobs;
+    }
+
+    void setThreshold(int _t){
+        threshold = _t;
     }
 };

@@ -60,7 +60,7 @@ public:
     ofxCvGrayscaleImage 	grayDiff_1, grayDiff_2;
 
     int 				threshold;
-    bool				bLearnBakground;
+    bool				bLearnBackground;
 
     SimpleThread thread_1;
     SimpleThread1 thread_2;
@@ -77,7 +77,7 @@ public:
         ofRectangle guiIn;
         ofRectangle guiOut;
 
-        bool toggleDebugOutput;
+        bool toggleDebugOutput, debug;
         ofImage twoScreenImage;
 };
 

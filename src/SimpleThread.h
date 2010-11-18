@@ -72,4 +72,8 @@ public:
     {
         return contourFinder.blobs;
     }
+
+    void setThreshold(int _t){
+        threshold = _t;
+    }
 };
