@@ -13,9 +13,24 @@ void testApp::setup()
     thread_1.cam.initGrabber(320,240);
     thread_1.cam.setUseTexture(false);
 
+    thread_2.cam.loadMovie("fingers.mov");
+    thread_2.cam.play();
+    thread_2.cam.setUseTexture(false);
+
     thread_1.initAndSleep();
+    thread_2.initAndSleep();
 
     ID = 0;
+
+    //RM
+    rm.allocateForNScreens(2, 800, 600);
+    rm.loadFromXml("fboSettings.xml");
+
+    guiIn   = ofRectangle(320, 295, 500, 178);
+    guiOut  = ofRectangle(guiIn.x + guiIn.width + 30, guiIn.y, 500, 178);
+
+    twoScreenImage.loadImage("adam.jpg");
+    toggleDebugOutput = true;
 }
 
 void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
@@ -130,6 +145,12 @@ void testApp::update()
     thread_1.updateOnce();
     blobs_1 = thread_1.getBlobs();
     trackBlobs(blobs_1);
+
+    thread_2.updateOnce();
+    blobs_2 = thread_2.getBlobs();
+    trackBlobs(blobs_2);
+
+    rm.myOffscreenTexture.clear();
 }
 
 //--------------------------------------------------------------
@@ -137,27 +158,35 @@ void testApp::draw()
 {
 
     thread_1.draw();
+    thread_2.draw();
 
     // then draw the contours:
 
     ofFill();
     ofSetHexColor(0x333333);
-    ofRect(360,540,320,240);
-    ofRect(1040,540,320,240);
+    //ofRect(360,540,320,240);
+    //ofRect(680,540,320,240);
     ofSetHexColor(0xffffff);
 
-    ofTranslate(360,520);
-    for (int i = 0; i < blobs.size(); i++)
+    //ofTranslate(320,295);
+    //rm.myOffscreenTexture.clear((float)0.0,(float)0.0,(float)0.0,(float)0.0);
+
+    rm.startOffscreenDraw();
+    ofPushMatrix();
+    glScalef(800/640,600/240,0);
+    if( toggleDebugOutput )
     {
-        // pos += (targetPos - pos) * SPEED;
+        for (int i = 0; i < blobs.size(); i++)
+        {
+            // pos += (targetPos - pos) * SPEED;
 
-        ofSetHexColor(0xdd00cc);
+            ofSetHexColor(0xdd00cc);
 
-        ofNoFill();
+            ofNoFill();
             ofRect( blobs[i].boundingRect.x, blobs[i].boundingRect.y,
                     blobs[i].boundingRect.width, blobs[i].boundingRect.height );
 
-        ofSetHexColor(0x00ffff);
+            ofSetHexColor(0x00ffff);
 
             ofNoFill();
             ofBeginShape();
@@ -168,16 +197,37 @@ void testApp::draw()
             ofEndShape();
 
 
-        ofFill();
-        ofEnableAlphaBlending();
-        ofSetColor(255,255,255,blobs[i].alpha);
-        ofLine(blobs[i].x,blobs[i].y,blobs[i].pX,blobs[i].pY);
-        float size = sqrt( pow(blobs[i].boundingRect.width,2) + pow(blobs[i].boundingRect.height,2) ) / 2 * 0.8;
-        ofCircle(blobs[i].x,blobs[i].y,size);
+            ofFill();
+            ofEnableAlphaBlending();
+            ofSetColor(255,255,255,blobs[i].alpha);
+            ofLine(blobs[i].x,blobs[i].y,blobs[i].pX,blobs[i].pY);
+            float size = sqrt( pow(blobs[i].boundingRect.width,2) + pow(blobs[i].boundingRect.height,2) ) / 2 * 0.8;
+            ofCircle(blobs[i].x,blobs[i].y,size);
 
-        ofDisableAlphaBlending();
+            ofDisableAlphaBlending();
+
+        }
     }
-    ofTranslate(-360,-520);
+    else
+    {
+        ofSetHexColor(0x323232);
+        ofRect(0, 0, rm.width, rm.height);
+
+        ofSetHexColor(0xFF0000);
+        ofRect(0, 0, 100, 600);
+
+        ofSetHexColor(0x00FF00);
+        ofRect(700, 0, 100, 600);
+
+        ofSetHexColor(0xFFFF00);
+        ofRect(390, 0, 20, 100);
+
+        ofSetHexColor(0x0000FF);
+        ofRect(390, 500, 20, 100);
+    }
+    ofPopMatrix();
+    rm.endOffscreenDraw();
+    //ofTranslate(-360,-520);
 
 
     // finally, a report:
@@ -202,7 +252,56 @@ void testApp::draw()
 
     char reportStr[1024];
     sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nthreshold %i (press: +/-)\ntracked Blob count: %i\nfps: %f", threshold, blobs.size(), ofGetFrameRate());
-    ofDrawBitmapString(reportStr, 20, 600);
+    ofDrawBitmapString(reportStr, 10, 295);
+
+    //RM
+
+    /*rm.startOffscreenDraw();
+
+        if( toggleImage ){
+            ofSetHexColor(0xffffff);
+            twoScreenImage.draw(0, 0, 1400,500);
+        }
+        else{
+
+            ofSetHexColor(0x323232);
+            ofRect(0, 0, rm.width, rm.height);
+
+            ofSetHexColor(0xFF0000);
+            ofRect(100, 100, 100, 100);
+
+            ofSetHexColor(0xFF00FF);
+            ofRect(200, 100, 100, 100);
+
+            ofSetHexColor(0xFFFF00);
+            ofRect(800, 100, 100, 100);
+
+            ofSetHexColor(0x0000FF);
+            ofRect(1050, 100, 100, 100);
+        }
+
+    rm.endOffscreenDraw();*/
+
+    ofSetHexColor(0xffffff);
+
+    rm.drawInputDiagnostically(guiIn.x, guiIn.y, guiIn.width, guiIn.height);
+    rm.drawOutputDiagnostically(guiOut.x, guiOut.y, guiOut.width, guiOut.height);
+
+    glPushMatrix();
+    glTranslatef(320, 575, 0);
+    glScalef(0.3,0.3,0);
+    ofSetHexColor(0xffffff);
+    rm.drawScreen(0);
+    rm.drawScreen(1);
+    glPopMatrix();
+
+    ofDrawBitmapString("internal texture points", 320, 290);
+    ofDrawBitmapString("texture warping points", 850, 290);
+
+    ofDrawBitmapString("screen 1", 10, 290);
+    ofDrawBitmapString("screen 2", 710, 290);
+
+    ofDrawBitmapString("s - to save to xml   r - to reload from xml    c - reset coordinates    g -  draw open gl shapes\n", 10, 275);
 }
 
 
@@ -210,19 +309,40 @@ void testApp::draw()
 void testApp::keyPressed  (int key)
 {
 
-    	switch (key){
-    		case ' ':
-    			thread_1.bLearnBackground = true;
-    			break;
-    		case '+':
-    			threshold ++;
-    			if (threshold > 255) threshold = 255;
-    			break;
-    		case '-':
-    			threshold --;
-    			if (threshold < 0) threshold = 0;
-    			break;
-    	}
+    switch (key)
+    {
+    case ' ':
+        thread_1.bLearnBackground = true;
+        break;
+    case '+':
+        threshold ++;
+        if (threshold > 255) threshold = 255;
+        break;
+    case '-':
+        threshold --;
+        if (threshold < 0) threshold = 0;
+        break;
+    }
+
+    if( key == 'g')
+    {
+        toggleDebugOutput = !toggleDebugOutput;
+    }
+
+    if( key == 's')
+    {
+        rm.saveToXml();
+    }
+
+    if( key == 'r' )
+    {
+        rm.reloadFromXml();
+    }
+
+    if(key == 'c')
+    {
+        rm.resetCoordinates();
+    }
 }
 
 //--------------------------------------------------------------
@@ -233,11 +353,17 @@ void testApp::mouseMoved(int x, int y )
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button)
 {
+    rm.mouseDragInputPoint(guiIn, ofPoint(x, y));
+    rm.mouseDragOutputPoint(guiOut, ofPoint( x, y));
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button)
 {
+    if( !rm.mouseSelectInputPoint(guiIn, ofPoint(x, y)) )
+    {
+        rm.mouseSelectOutputPoint(guiOut, ofPoint( x,  y));
+    }
 }
 
 //--------------------------------------------------------------
@@ -252,7 +378,8 @@ void testApp::windowResized(int w, int h)
 
 }
 
-void testApp::exit() {
+void testApp::exit()
+{
     thread_1.stop();
 }
 

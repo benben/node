@@ -5,7 +5,9 @@
 
 #include "ofxOpenCv.h"
 #include "SimpleThread.h"
+#include "SimpleThread1.h"
 #include "ofxVectorMath.h"
+#include "renderManager.h"
 
 //#define _USE_LIVE_VIDEO		// uncomment this to use a live camera
 // otherwise, we'll use a movie file
@@ -60,12 +62,23 @@ public:
     int 				threshold;
     bool				bLearnBakground;
 
-    SimpleThread thread_1, thread_2;
+    SimpleThread thread_1;
+    SimpleThread1 thread_2;
 
     vector<ofxCvBlob> blobs_1, blobs_2;
     vector<trackedBlob> blobs;
     int                 ID;
     ofVideoGrabber  cam;
+
+    //RM
+
+        renderManager rm;
+
+        ofRectangle guiIn;
+        ofRectangle guiOut;
+
+        bool toggleDebugOutput;
+        ofImage twoScreenImage;
 };
 
 #endif

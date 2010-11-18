@@ -3,10 +3,10 @@
 #include "ofMain.h"
 #include "ofxRuiThread.h"
 
-class SimpleThread:public ofxRuiThread
+class SimpleThread1:public ofxRuiThread
 {
 public:
-    ofVideoGrabber cam;
+    ofVideoPlayer cam;
 
     ofxCvColorImage		colorImg;
 
@@ -18,7 +18,7 @@ public:
     bool				bLearnBackground;
     ofxCvContourFinder 	contourFinder;
 
-    SimpleThread()
+    SimpleThread1()
     {
         //cam.initGrabber(640,480);
         //cam.setUseTexture(false);
@@ -36,7 +36,7 @@ public:
 
     void updateThread()
     {
-            cam.grabFrame();
+            cam.idleMovie();
 
             if(cam.isFrameNew())
             {
@@ -56,16 +56,23 @@ public:
                 // also, find holes is set to true so we will get interior contours as well....
                 //contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, true);	// find holes
                 contourFinder.findContours(grayDiff, 20, (340*240)/3, 10, false);
+                    for (int i = 0; i < contourFinder.nBlobs; i++){
+        contourFinder.blobs[i].centroid.x += 320;
+        contourFinder.blobs[i].boundingRect.x += 320;
+        for (int j = 0; j < contourFinder.blobs[i].nPts; j++){
+            contourFinder.blobs[i].pts[j].x += 320;
+        }
+    }
             }
     }
 
     void draw()
     {
         ofSetHexColor(0xffffff);
-        colorImg.draw(10,10,160,120);
-        grayImg.draw(180,10,160,120);
-        grayBg.draw(10,140,160,120);
-        grayDiff.draw(180,140,160,120);
+        colorImg.draw(360,10,160,120);
+        grayImg.draw(530,10,160,120);
+        grayBg.draw(360,140,160,120);
+        grayDiff.draw(530,140,160,120);
     }
 
     vector<ofxCvBlob> getBlobs()

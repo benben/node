@@ -82,6 +82,9 @@
 			<Add directory="../../../addons/ofxXmlSettings/src" />
 			<Add directory="../../../addons/ofxXmlSettings/libs" />
 			<Add directory="../../../addons/ofxRuiThread/src" />
+			<Add directory="src/FBO" />
+			<Add directory="../../../addons/ofxXmlSettings/libs" />
+			<Add directory="../../../addons/ofxXmlSettings/src" />
 		</Compiler>
 		<Linker>
 			<Add library="fmodex" />
@@ -115,6 +118,18 @@
 			<Add after="#" />
 			<Add after="cp -r ../../../export/linux64/libs $(PROJECT_DIR)bin/" />
 		</ExtraCommands>
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.cpp" />
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxml.h" />
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlerror.cpp" />
+		<Unit filename="../../../addons/ofxXmlSettings/libs/tinyxmlparser.cpp" />
+		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.cpp" />
+		<Unit filename="../../../addons/ofxXmlSettings/src/ofxXmlSettings.h" />
+		<Unit filename="src/FBO/ofTextureAdv.cpp" />
+		<Unit filename="src/FBO/ofTextureAdv.h" />
+		<Unit filename="src/FBO/ofxFBOTexture.cpp" />
+		<Unit filename="src/FBO/ofxFBOTexture.h" />
+		<Unit filename="src/FBO/renderManager.cpp" />
+		<Unit filename="src/FBO/renderManager.h" />
 		<Unit filename="../../../addons/ofxOpenCv/src/ofxCvBlob.h">
 			<Option virtualFolder="addons/ofxOpenCv/src" />
 		</Unit>
@@ -168,6 +183,9 @@
 		<Unit filename="../../../addons/ofxThread/src/ofxThread.cpp" />
 		<Unit filename="../../../addons/ofxThread/src/ofxThread.h" />
 		<Unit filename="src/SimpleThread.h">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/SimpleThread1.h">
 			<Option virtualFolder="src/" />
 		</Unit>
 		<Unit filename="src/main.cpp">
