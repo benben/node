@@ -57,6 +57,8 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
 
     ofxVec2f _b;
     ofxVec2f b;
+    float dist;
+    float speed = 0.7;
     for (int i = 0; i < _blobs.size(); i++)
     {
         bool bIsNewBlob = true;
@@ -64,14 +66,18 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
         {
             _b.set( _blobs[i].centroid );
             b.set(blobs[j].x, blobs[j].y);
-            if(b.distance(_b) < 10)
+            dist = b.distance(_b);
+            if(dist < 20)
             {
                 bIsNewBlob = false;
-                blobs[j].frame = ofGetFrameNum();
                 blobs[j].pX = blobs[j].x;
                 blobs[j].pY = blobs[j].y;
-                blobs[j].x = _blobs[i].centroid.x;
-                blobs[j].y = _blobs[i].centroid.y;
+                if (dist >= 5) {
+                    // pos += (targetPos - pos) * SPEED;
+                    blobs[j].x = (_blobs[i].centroid.x - blobs[j].x) * speed;
+                    blobs[j].y = (_blobs[i].centroid.y - blobs[j].y) * speed;
+                }
+                blobs[j].frame = ofGetFrameNum();
                 blobs[j].nPts = _blobs[i].nPts;
                 blobs[j].pts = _blobs[i].pts;
                 blobs[j].boundingRect.x           = _blobs[i].boundingRect.x;
@@ -206,8 +212,6 @@ void testApp::draw()
     {
         for (int i = 0; i < blobs.size(); i++)
         {
-            // pos += (targetPos - pos) * SPEED;
-
             ofSetHexColor(0xdd00cc);
 
             ofNoFill();
