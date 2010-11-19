@@ -34,7 +34,7 @@ void testApp::setup()
     rm.loadFromXml("fboSettings.xml");
 
     guiIn   = ofRectangle(320, 295, 500, 178);
-    guiOut  = ofRectangle(guiIn.x + guiIn.width + 30, guiIn.y, 500, 178);
+    guiOut  = ofRectangle(guiIn.x + guiIn.width + 300, guiIn.y, 500, 178);
 
     twoScreenImage.loadImage("adam.jpg");
     toggleDebugOutput = true;
@@ -45,6 +45,7 @@ void testApp::setup()
     gui.addTitle("1");
     //gui.config->gridSize.set(340,0,0);
     gui.addQuadWarper("Cam 1", thread_1.colorImg, thread_1.warpPoints);
+    gui.addSlider("threshold", threshold,20,160);
     gui.addTitle("-").newColumn = true;
     gui.addTitle("2").newColumn = true;
     gui.addQuadWarper("Cam 2", thread_2.colorImg, thread_2.warpPoints);
@@ -58,7 +59,7 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
     ofxVec2f _b;
     ofxVec2f b;
     float dist;
-    float speed = 0.7;
+    float speed = 0.5;
     for (int i = 0; i < _blobs.size(); i++)
     {
         bool bIsNewBlob = true;
@@ -72,18 +73,23 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
                 bIsNewBlob = false;
                 blobs[j].pX = blobs[j].x;
                 blobs[j].pY = blobs[j].y;
-                if (dist >= 5) {
+                if (dist >= 2) {
                     // pos += (targetPos - pos) * SPEED;
-                    blobs[j].x = (_blobs[i].centroid.x - blobs[j].x) * speed;
-                    blobs[j].y = (_blobs[i].centroid.y - blobs[j].y) * speed;
+                    blobs[j].x += (_blobs[i].centroid.x - blobs[j].x) * speed;
+                    blobs[j].y += (_blobs[i].centroid.y - blobs[j].y) * speed;
+                    blobs[j].boundingRect.x           += (_blobs[i].boundingRect.x - blobs[j].boundingRect.x) * speed;
+                    blobs[j].boundingRect.y           += (_blobs[i].boundingRect.y - blobs[j].boundingRect.y) * speed;
                 }
                 blobs[j].frame = ofGetFrameNum();
                 blobs[j].nPts = _blobs[i].nPts;
                 blobs[j].pts = _blobs[i].pts;
-                blobs[j].boundingRect.x           = _blobs[i].boundingRect.x;
-                blobs[j].boundingRect.y           = _blobs[i].boundingRect.y;
-                blobs[j].boundingRect.width       = _blobs[i].boundingRect.width;
-                blobs[j].boundingRect.height      = _blobs[i].boundingRect.height;
+
+                if(_blobs[i].boundingRect.width <= blobs[j].boundingRect.width -2 || _blobs[i].boundingRect.width >= blobs[j].boundingRect.width +2) {
+                    blobs[j].boundingRect.width += (_blobs[i].boundingRect.width - blobs[j].boundingRect.width) * speed;
+                }
+                if(_blobs[i].boundingRect.height <= blobs[j].boundingRect.height -2 || _blobs[i].boundingRect.height >= blobs[j].boundingRect.height +2) {
+                    blobs[j].boundingRect.height += (_blobs[i].boundingRect.height - blobs[j].boundingRect.height) * speed;
+                }
             }
 
         }
@@ -129,7 +135,7 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
             blobs[j].alpha = (blobs[j].framesAlive - 10) * 5;
         }
 
-        //set state to alive, if they live longer then 10 frames
+        //set state to alive, if they live longer then 30 frames
         //set alpha to 255
         if(blobs[j].framesAlive > 30)
         {
@@ -137,7 +143,7 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
             blobs[j].alpha = 255;
         }
 
-        //set state dying which weren't updated since the last 5 frames
+        //set state dying which weren't updated since the last 2 frames
         //fade alpha out
         if(blobs[j].frame < ofGetFrameNum() - 2)
         {
@@ -272,20 +278,40 @@ void testApp::draw()
 
     ofSetHexColor(0xffffff);
 
-    ofDrawBitmapString("ID",800,20);
-    ofDrawBitmapString("x",900,20);
-    ofDrawBitmapString("y",1000,20);
-    ofDrawBitmapString("pX",1100,20);
-    ofDrawBitmapString("pY",1200,20);
-    ofDrawBitmapString("Alive",1300,20);
+    ofDrawBitmapString("ID",1024,20);
+    ofDrawBitmapString("x",1124,20);
+    ofDrawBitmapString("y",1224,20);
+    ofDrawBitmapString("pX",1324,20);
+    ofDrawBitmapString("pY",1424,20);
+    ofDrawBitmapString("width",1524,20);
+    ofDrawBitmapString("height",1624,20);
+    ofDrawBitmapString("frame",1724,20);
+    ofDrawBitmapString("alive",1824,20);
+    ofDrawBitmapString("state",1924,20);
     for (int j = 0; j < blobs.size(); j++)
     {
-        ofDrawBitmapString(ofToString(blobs[j].ID),800,(j*20) +40 );
-        ofDrawBitmapString(ofToString(blobs[j].x),900,(j*20) +40 );
-        ofDrawBitmapString(ofToString(blobs[j].y),1000,(j*20) +40 );
-        ofDrawBitmapString(ofToString(blobs[j].pX),1100,(j*20) +40 );
-        ofDrawBitmapString(ofToString(blobs[j].pY),1200,(j*20) +40 );
-        ofDrawBitmapString(ofToString(blobs[j].framesAlive),1300,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].ID),1024,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].x),1124,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].y),1224,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].pX),1324,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].pY),1424,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].boundingRect.width),1524,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].boundingRect.height),1624,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].frame),1724,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].framesAlive),1824,(j*20) +40 );
+        string state;
+        switch(blobs[j].state) {
+            case UPCOMING:
+                state = "UPCOMING";
+                break;
+            case ALIVE:
+                state = "ALIVE";
+                break;
+            case DYING:
+                state = "DYING";
+                break;
+        }
+        ofDrawBitmapString(state,1924,(j*20) +40 );
     }
 
     char reportStr[1024];
