@@ -10,7 +10,7 @@ void testApp::setup()
 
     thread_1.cam.setVerbose(true);
     thread_1.cam.setDesiredFrameRate(60);
-    thread_1.cam.setDeviceID(0);
+    thread_1.cam.setDeviceID(1);
     thread_1.cam.initGrabber(320,240);
     thread_1.cam.setUseTexture(false);
 
@@ -20,7 +20,7 @@ void testApp::setup()
 
     thread_2.cam.setVerbose(true);
     thread_2.cam.setDesiredFrameRate(60);
-    thread_2.cam.setDeviceID(1);
+    thread_2.cam.setDeviceID(0);
     thread_2.cam.initGrabber(320,240);
     thread_2.cam.setUseTexture(false);
 
@@ -30,7 +30,7 @@ void testApp::setup()
     ID = 0;
 
     //RM
-    rm.allocateForNScreens(2, 800, 600);
+    rm.allocateForNScreens(2, 1024, 768);
     rm.loadFromXml("fboSettings.xml");
 
     guiIn   = ofRectangle(320, 295, 500, 178);
@@ -45,6 +45,7 @@ void testApp::setup()
     gui.addTitle("1");
     //gui.config->gridSize.set(340,0,0);
     gui.addQuadWarper("Cam 1", thread_1.colorImg, thread_1.warpPoints);
+    gui.addTitle("-").newColumn = true;
     gui.addTitle("2").newColumn = true;
     gui.addQuadWarper("Cam 2", thread_2.colorImg, thread_2.warpPoints);
     gui.loadFromXML();
@@ -200,7 +201,7 @@ void testApp::draw()
 
     rm.startOffscreenDraw();
     ofPushMatrix();
-    glScalef(800/640,600/240,0);
+    glScalef(1024/640,768/240,0);
     if( toggleDebugOutput )
     {
         for (int i = 0; i < blobs.size(); i++)
@@ -241,23 +242,23 @@ void testApp::draw()
         ofRect(0, 0, rm.width, rm.height);
 
         ofSetHexColor(0xFF0000);
-        ofRect(0, 0, 100, 600);
+        ofRect(0, 0, 100, 768);
 
         ofSetHexColor(0x0000FF);
-        ofRect(390, 200, 20, 100);
+        ofRect(502, 130, 20, 150);
 
         ofSetHexColor(0x00FF00);
-        ofRect(700, 0, 100, 600);
+        ofRect(924, 0, 100, 400);
 
         ofSetHexColor(0xFFFF00);
-        ofRect(390, 0, 20, 100);
+        ofRect(502, 0, 20, 130);
 
 
 
         ofSetHexColor(0xFF00FF);
-        ofRect(0,190,800,20);
-        ofSetHexColor(0xFF00FF);
-        ofRect(0,190,800,20);
+        ofRect(0,50,1024,20);
+        //ofSetHexColor(0xFF00FF);
+        //ofRect(0,190,800,20);
     }
     ofPopMatrix();
     rm.endOffscreenDraw();
@@ -337,7 +338,8 @@ void testApp::draw()
     ofDrawBitmapString("s - to save to xml   r - to reload from xml    c - reset coordinates    g -  draw open gl shapes\n", 10, 275);
 
     if(debug) {
-
+     ofSetColor(0);
+    ofRect(0,0,2048,768);
     glPushMatrix();
     glTranslatef(0, 0, 0);
     glScalef(2,1,0);
