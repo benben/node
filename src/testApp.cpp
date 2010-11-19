@@ -117,10 +117,10 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
         }
     }
 
-    //finally kill all blobs which weren't updated the last 50 frames
+    //finally kill all blobs which weren't updated the last 25 frames
     for (int j = 0; j < blobs.size(); j++)
     {
-        if(blobs[j].frame < ofGetFrameNum() - 50)
+        if(blobs[j].frame < ofGetFrameNum() - 25)
         {
             blobs.erase(blobs.begin() + j);
         }
