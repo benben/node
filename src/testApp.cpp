@@ -55,39 +55,42 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
     ofxVec2f b;
     float dist;
     float speed = 0.8;
-    float dX = 0;
-    float dY = 0;
-    float minD = 4;
+    float dX;
+    float dY;
+    float minD = 2.5;
     float maxD = 25;
+    bool bIsNewBlob;
 
     for (int i = 0; i < _blobs.size(); i++)
     {
-        bool bIsNewBlob = true;
+        bIsNewBlob = true;
         for (int j = 0; j < blobs.size(); j++)
         {
             _b.set( _blobs[i].boundingRect.x, _blobs[i].boundingRect.y );
             b.set(blobs[j].x, blobs[j].y);
             dist = b.distance(_b);
-            if(dist < 25)
+            if(dist < 20)
             {
                 bIsNewBlob = false;
+
                 blobs[j].pX = blobs[j].x;
                 blobs[j].pY = blobs[j].y;
-                //if (dist >= 5)
-                //{
-                    // pos += (targetPos - pos) * SPEED;
-                    float dX = (_blobs[i].boundingRect.x - blobs[j].x) * speed;
-                    float dY = (_blobs[i].boundingRect.y - blobs[j].y) * speed;
 
-                    if((dX >= minD || dX <= -minD) && (dX <= maxD || dX >= -maxD)) {
-                        blobs[j].x += dX;
-                    }
-                    if((dY >= minD || dY <= -minD) && (dY <= maxD || dY >= -maxD)) {
-                        blobs[j].y += dY;
-                    }
-                    //blobs[j].boundingRect.x           += (_blobs[i].boundingRect.x - blobs[j].boundingRect.x) * speed;
-                    //blobs[j].boundingRect.y           += (_blobs[i].boundingRect.y - blobs[j].boundingRect.y) * speed;
-                //}
+                // pos += (targetPos - pos) * SPEED;
+                dX = (_blobs[i].boundingRect.x - blobs[j].x) * speed;
+                dY = (_blobs[i].boundingRect.y - blobs[j].y) * speed;
+
+                if((dX >= minD || dX <= -minD) && (dX <= maxD || dX >= -maxD))
+                {
+                    blobs[j].x += dX;
+                }
+                if((dY >= minD || dY <= -minD) && (dY <= maxD || dY >= -maxD))
+                {
+                    blobs[j].y += dY;
+                }
+                //blobs[j].boundingRect.x           += (_blobs[i].boundingRect.x - blobs[j].boundingRect.x) * speed;
+                //blobs[j].boundingRect.y           += (_blobs[i].boundingRect.y - blobs[j].boundingRect.y) * speed;
+
                 blobs[j].frame = ofGetFrameNum();
                 blobs[j].nPts = _blobs[i].nPts;
                 blobs[j].pts = _blobs[i].pts;
@@ -212,7 +215,7 @@ void testApp::draw()
     rm.startOffscreenDraw();
     switch (debugOutput)
     {
-    //DRAW THE REAL OUTPUT
+        //DRAW THE REAL OUTPUT
     case 0:
         glPushMatrix();
         glScalef(1920/640,768/240,0);
@@ -230,7 +233,7 @@ void testApp::draw()
         }
         glPopMatrix();
         break;
-    //DRAW OUTPUT WITH BLOBS
+        //DRAW OUTPUT WITH BLOBS
     case 1:
         glPushMatrix();
         glScalef(1920/640,768/240,0);
@@ -264,7 +267,7 @@ void testApp::draw()
         }
         glPopMatrix();
         break;
-    //DRAW GL BOXES
+        //DRAW GL BOXES
     case 2:
         ofSetHexColor(0x323232);
         ofRect(0, 0, rm.width, rm.height);
@@ -286,7 +289,7 @@ void testApp::draw()
         ofSetHexColor(0xFF00FF);
         ofRect(0,50,1024,20);
         break;
-    //DRAW AN IMAGE
+        //DRAW AN IMAGE
     case 3:
         twoScreenImage.draw(0,0);
         break;
@@ -372,9 +375,9 @@ void testApp::drawDebugTable ()
     ofDrawBitmapString("pY",start+250,20);
     ofDrawBitmapString("width",start+320,20);
     ofDrawBitmapString("height",start+390,20);
-    ofDrawBitmapString("frame",start+460,20);
-    ofDrawBitmapString("alive",start+530,20);
-    ofDrawBitmapString("state",start+600,20);
+    ofDrawBitmapString("frame",start+450,20);
+    ofDrawBitmapString("alive",start+505,20);
+    ofDrawBitmapString("state",start+550,20);
     for (int j = 0; j < blobs.size(); j++)
     {
         ofDrawBitmapString(ofToString(blobs[j].ID),start,(j*20) +40 );
@@ -384,8 +387,8 @@ void testApp::drawDebugTable ()
         ofDrawBitmapString(ofToString(blobs[j].pY,2),start+250,(j*20) +40 );
         ofDrawBitmapString(ofToString(blobs[j].boundingRect.width,2),start+320,(j*20) +40 );
         ofDrawBitmapString(ofToString(blobs[j].boundingRect.height,2),start+390,(j*20) +40 );
-        ofDrawBitmapString(ofToString(blobs[j].frame,2),start+460,(j*20) +40 );
-        ofDrawBitmapString(ofToString(blobs[j].framesAlive,2),start+530,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].frame),start+450,(j*20) +40 );
+        ofDrawBitmapString(ofToString(blobs[j].framesAlive),start+505,(j*20) +40 );
         string state;
         switch(blobs[j].state)
         {
@@ -399,7 +402,7 @@ void testApp::drawDebugTable ()
             state = "DYING";
             break;
         }
-        ofDrawBitmapString(state,start+600,(j*20) +40 );
+        ofDrawBitmapString(state,start+550,(j*20) +40 );
     }
 }
 //--------------------------------------------------------------
@@ -424,7 +427,8 @@ void testApp::keyPressed  (int key)
     if( key == 'g')
     {
         debugOutput += 1;
-        if(debugOutput > 3) {
+        if(debugOutput > 3)
+        {
             debugOutput = 0;
         }
     }
