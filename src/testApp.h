@@ -51,34 +51,27 @@ public:
     void mouseReleased(int x, int y, int button);
     void windowResized(int w, int h);
 
-    ofVideoPlayer 		cam_1, cam_2;
-
-    ofxCvColorImage		colorImg_1, colorImg_2;
-
-    ofxCvGrayscaleImage 	grayImg_1, grayImg_2;
-    ofxCvGrayscaleImage 	grayBg_1, grayBg_2;
-    ofxCvGrayscaleImage 	grayDiff_1, grayDiff_2;
+    void drawInputs();
+    void drawDebugTable();
 
     int 				threshold;
     bool				bLearnBackground;
 
-    SimpleThread thread_1;
-    SimpleThread1 thread_2;
+    SimpleThread thread_1, thread_2;
 
-    vector<ofxCvBlob> blobs_1, blobs_2;
     vector<trackedBlob> blobs;
     int                 ID;
-    ofVideoGrabber  cam;
 
     //RM
 
-        renderManager rm;
+    renderManager rm;
 
-        ofRectangle guiIn;
-        ofRectangle guiOut;
+    ofRectangle guiIn;
+    ofRectangle guiOut;
 
-        bool toggleDebugOutput, debug;
-        ofImage twoScreenImage;
+    int debugOutput;
+    bool debug;
+    ofImage twoScreenImage;
 };
 
 #endif
