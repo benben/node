@@ -5,7 +5,6 @@
 
 #include "ofxOpenCv.h"
 #include "SimpleThread.h"
-#include "SimpleThread1.h"
 #include "ofxVectorMath.h"
 #include "renderManager.h"
 

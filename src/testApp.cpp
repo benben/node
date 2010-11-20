@@ -54,13 +54,18 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
     ofxVec2f _b;
     ofxVec2f b;
     float dist;
-    float speed = 0.5;
+    float speed = 0.8;
+    float dX = 0;
+    float dY = 0;
+    float minD = 4;
+    float maxD = 25;
+
     for (int i = 0; i < _blobs.size(); i++)
     {
         bool bIsNewBlob = true;
         for (int j = 0; j < blobs.size(); j++)
         {
-            _b.set( _blobs[i].centroid );
+            _b.set( _blobs[i].boundingRect.x, _blobs[i].boundingRect.y );
             b.set(blobs[j].x, blobs[j].y);
             dist = b.distance(_b);
             if(dist < 25)
@@ -68,14 +73,21 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
                 bIsNewBlob = false;
                 blobs[j].pX = blobs[j].x;
                 blobs[j].pY = blobs[j].y;
-                if (dist >= 5)
-                {
+                //if (dist >= 5)
+                //{
                     // pos += (targetPos - pos) * SPEED;
-                    blobs[j].x += (_blobs[i].centroid.x - blobs[j].x) * speed;
-                    blobs[j].y += (_blobs[i].centroid.y - blobs[j].y) * speed;
+                    float dX = (_blobs[i].boundingRect.x - blobs[j].x) * speed;
+                    float dY = (_blobs[i].boundingRect.y - blobs[j].y) * speed;
+
+                    if((dX >= minD || dX <= -minD) && (dX <= maxD || dX >= -maxD)) {
+                        blobs[j].x += dX;
+                    }
+                    if((dY >= minD || dY <= -minD) && (dY <= maxD || dY >= -maxD)) {
+                        blobs[j].y += dY;
+                    }
                     //blobs[j].boundingRect.x           += (_blobs[i].boundingRect.x - blobs[j].boundingRect.x) * speed;
                     //blobs[j].boundingRect.y           += (_blobs[i].boundingRect.y - blobs[j].boundingRect.y) * speed;
-                }
+                //}
                 blobs[j].frame = ofGetFrameNum();
                 blobs[j].nPts = _blobs[i].nPts;
                 blobs[j].pts = _blobs[i].pts;
@@ -99,16 +111,16 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
             ID++;
             tB.state = UPCOMING;
             tB.frame = ofGetFrameNum();
-            tB.x = _blobs[i].centroid.x;
-            tB.y = _blobs[i].centroid.y;
-            tB.pX = _blobs[i].centroid.x;
-            tB.pY = _blobs[i].centroid.y;
+            tB.x = _blobs[i].boundingRect.x;
+            tB.y = _blobs[i].boundingRect.y;
+            tB.pX = _blobs[i].boundingRect.x;
+            tB.pY = _blobs[i].boundingRect.y;
             tB.nPts = _blobs[i].nPts;
             tB.pts = _blobs[i].pts;
-            tB.boundingRect.x           = _blobs[i].boundingRect.x;
+            /*tB.boundingRect.x           = _blobs[i].boundingRect.x;
             tB.boundingRect.y           = _blobs[i].boundingRect.y;
             tB.boundingRect.width       = _blobs[i].boundingRect.width;
-            tB.boundingRect.height      = _blobs[i].boundingRect.height;
+            tB.boundingRect.height      = _blobs[i].boundingRect.height;*/
             tB.framesAlive = 0;
             tB.alpha = 0;
             blobs.push_back(tB);
@@ -118,7 +130,7 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
     //finally kill all blobs which weren't updated the last 25 frames
     for (int j = 0; j < blobs.size(); j++)
     {
-        if(blobs[j].frame < ofGetFrameNum() - 25)
+        if(blobs[j].frame < ofGetFrameNum() - 40)
         {
             blobs.erase(blobs.begin() + j);
         }
@@ -135,7 +147,7 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
 
         //set state to alive, if they live longer then 30 frames
         //set alpha to 255
-        if(blobs[j].framesAlive > 30)
+        if(blobs[j].framesAlive > 40)
         {
             blobs[j].state = ALIVE;
             blobs[j].alpha = 255;
@@ -146,7 +158,7 @@ void testApp::trackBlobs(vector<ofxCvBlob> _blobs)
         if(blobs[j].frame < ofGetFrameNum() - 2)
         {
             blobs[j].state = DYING;
-            blobs[j].alpha = -6 * (ofGetFrameNum() - blobs[j].frame) + blobs[j].alpha;
+            blobs[j].alpha = -5 * (ofGetFrameNum() - blobs[j].frame) + blobs[j].alpha;
         }
 
         //count frames alive
@@ -211,7 +223,8 @@ void testApp::draw()
             ofFill();
             ofSetColor(255,255,255,blobs[i].alpha);
             ofLine(blobs[i].x,blobs[i].y,blobs[i].pX,blobs[i].pY);
-            ofCircle(blobs[i].x,blobs[i].y,15);
+
+            ofCircle(blobs[i].x+7.5,blobs[i].y+7.5,15);
 
             ofDisableAlphaBlending();
         }

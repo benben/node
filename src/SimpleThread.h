@@ -52,6 +52,10 @@ public:
             colorImg.setFromPixels(cam.getPixels(), 320,240);
             grayImg = colorImg;
             grayImg.warpPerspective(warpPoints[0],warpPoints[1],warpPoints[2],warpPoints[3]);
+
+            grayImg.erode();
+            grayImg.dilate();
+
             if (bLearnBackground == true)
             {
                 grayBg = grayImg;
