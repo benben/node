@@ -55,6 +55,7 @@ public:
 
             grayImg.erode();
             grayImg.dilate();
+            grayImg.blur(15);
 
             if (bLearnBackground == true)
             {

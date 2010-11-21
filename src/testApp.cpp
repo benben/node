@@ -215,25 +215,37 @@ void testApp::draw()
     rm.startOffscreenDraw();
     switch (debugOutput)
     {
-        //DRAW THE REAL OUTPUT
+    //DRAW THE REAL OUTPUT
     case 0:
         glPushMatrix();
         glScalef(1920/640,768/240,0);
         for (int i = 0; i < blobs.size(); i++)
         {
             ofEnableAlphaBlending();
+            ofEnableSmoothing();
 
             ofFill();
-            ofSetColor(255,255,255,blobs[i].alpha);
-            ofLine(blobs[i].x,blobs[i].y,blobs[i].pX,blobs[i].pY);
+            ofSetColor(255,255,255,blobs[i].alpha-200);
 
+            ofSetLineWidth(7);
+
+            for (int j = 0; j < blobs.size(); j++)
+            {
+                if(blobs[i].state == ALIVE && blobs[j].state == ALIVE) {
+                    ofLine(blobs[i].x+7.5, blobs[i].y+7.5, blobs[j].x+7.5, blobs[j].y+7.5);
+                }
+            }
+
+            ofSetLineWidth(1);
+            ofSetColor(255,255,255,blobs[i].alpha);
             ofCircle(blobs[i].x+7.5,blobs[i].y+7.5,15);
 
             ofDisableAlphaBlending();
+            ofDisableSmoothing();
         }
         glPopMatrix();
         break;
-        //DRAW OUTPUT WITH BLOBS
+    //DRAW OUTPUT WITH BLOBS
     case 1:
         glPushMatrix();
         glScalef(1920/640,768/240,0);
@@ -267,7 +279,7 @@ void testApp::draw()
         }
         glPopMatrix();
         break;
-        //DRAW GL BOXES
+    //DRAW GL BOXES
     case 2:
         ofSetHexColor(0x323232);
         ofRect(0, 0, rm.width, rm.height);
@@ -289,7 +301,7 @@ void testApp::draw()
         ofSetHexColor(0xFF00FF);
         ofRect(0,50,1024,20);
         break;
-        //DRAW AN IMAGE
+    //DRAW AN IMAGE
     case 3:
         twoScreenImage.draw(0,0);
         break;
