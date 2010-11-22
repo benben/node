@@ -29,13 +29,13 @@ void testApp::setup()
 
     //RM
     // num, renderwidth, renderheight
-    rm.allocateForNScreens(2, 1920, 768);
+    rm.allocateForNScreens(2, 2048, 768);
     rm.loadFromXml("fboSettings.xml");
 
     guiIn   = ofRectangle(320, 295, 500, 178);
     guiOut  = ofRectangle(guiIn.x + guiIn.width + 300, guiIn.y, 500, 178);
 
-    twoScreenImage.loadImage("adam_1920_768.jpg");
+    twoScreenImage.loadImage("adam_640_240.jpg");
     debugOutput = 0;
 
     //GUI
@@ -213,12 +213,12 @@ void testApp::draw()
     /* START TO DRAW IN THE FBO
     /****************************************/
     rm.startOffscreenDraw();
+    glPushMatrix();
+    glScalef((float)2048/640,(float)768/240,0);
     switch (debugOutput)
     {
     //DRAW THE REAL OUTPUT
     case 0:
-        glPushMatrix();
-        glScalef(1920/640,768/240,0);
         for (int i = 0; i < blobs.size(); i++)
         {
             ofEnableAlphaBlending();
@@ -243,12 +243,9 @@ void testApp::draw()
             ofDisableAlphaBlending();
             ofDisableSmoothing();
         }
-        glPopMatrix();
         break;
     //DRAW OUTPUT WITH BLOBS
     case 1:
-        glPushMatrix();
-        glScalef(1920/640,768/240,0);
         for (int i = 0; i < blobs.size(); i++)
         {
             ofSetHexColor(0xdd00cc);
@@ -277,35 +274,42 @@ void testApp::draw()
 
             ofDisableAlphaBlending();
         }
-        glPopMatrix();
         break;
     //DRAW GL BOXES
     case 2:
+        ofSetHexColor(0xFFFFFF);
+        ofRect(0, 0, 640, 240);
+
         ofSetHexColor(0x323232);
-        ofRect(0, 0, rm.width, rm.height);
+        ofRect(10, 10, 620, 220);
 
         ofSetHexColor(0xFF0000);
-        ofRect(0, 0, 100, 768);
+        ofRect(0, 0, 100, 240);
 
         ofSetHexColor(0x0000FF);
-        ofRect(502, 130, 20, 150);
+        ofRect(310, 120, 20, 120);
 
         ofSetHexColor(0x00FF00);
-        ofRect(924, 0, 100, 400);
+        ofRect(540, 0, 100, 240);
 
         ofSetHexColor(0xFFFF00);
-        ofRect(502, 0, 20, 130);
-
-
+        ofRect(310, 0, 20, 120);
 
         ofSetHexColor(0xFF00FF);
         ofRect(0,50,1024,20);
+
+        ofSetHexColor(0xFFFFFF);
+        ofCircle(160,120,80);
+
+        ofSetHexColor(0x000000);
+        ofCircle(480,120,80);
         break;
     //DRAW AN IMAGE
     case 3:
         twoScreenImage.draw(0,0);
         break;
     }
+    glPopMatrix();
     rm.endOffscreenDraw();
     /****************************************
     /* END TO DRAW IN THE FBO
@@ -317,12 +321,17 @@ void testApp::draw()
         /* DRAW THE REAL OUTPUT
         /****************************************/
         glPushMatrix();
-        ofRect(0,0,1920,768);
+        ofRect(0,0,2048,768);
         //glTranslatef(0, 0, 0);
         //glScalef(2,1,0);
         ofSetHexColor(0xffffff);
         rm.drawScreen(0);
+        //glPushMatrix();
+        //glTranslatef(-480,-500,0);
+        //ofRotate(45);
+
         rm.drawScreen(1);
+        //glPopMatrix();
         glPopMatrix();
     }
     else
